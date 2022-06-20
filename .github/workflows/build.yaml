@@ -1,0 +1,29 @@
+name: Build
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4.0.0
+        with:
+          python-version: 3.8
+          architecture: arm64
+      - name: install numpy 
+        run: python -m pip install numpy wheel
+      - name: Manylinux wheel builder
+        # You may pin to the exact commit or the version.
+        # uses: Niraj-Kamdar/manylinux-wheel-builder@0dcb5df47f4c0b46ab9c02653c415b1aedd30c84
+        uses: Niraj-Kamdar/manylinux-wheel-builder@0dcb5df47f4c0b46ab9c02653c415b1aedd30c84
+        with:
+          python-versions: 3.8 # default is 3.*
+      - name: Build wheels
+        run: python build/build.py
